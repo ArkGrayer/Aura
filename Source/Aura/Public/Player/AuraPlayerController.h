@@ -7,6 +7,8 @@
 #include "AuraPlayerController.generated.h"
 
 class UInputMappingContext;
+class UInputAction;
+struct FInputActionValue;
 
 /**
  * Classe de controlador de jogador personalizada para o projeto Aura.
@@ -21,6 +23,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 
 private:
 	/**
@@ -28,5 +31,10 @@ private:
 	 */
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputMappingContext> AuraContext;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> MoveAction;
+
+	void Move(const FInputActionValue& InputActionValue);
 	
 };
