@@ -6,12 +6,78 @@
 #include "Player/AuraPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Interaction/EnemyInterface.h"
 
 // Construtor padrão da classe AAuraPlayerController.
 AAuraPlayerController::AAuraPlayerController() {
 	
 	// Define que este controlador será replicado para os clientes.
 	bReplicates = true;
+	
+}
+
+void AAuraPlayerController::PlayerTick(float DeltaTime) {
+	Super::PlayerTick(DeltaTime);
+
+	CursorTrace();	
+	
+}
+
+void AAuraPlayerController::CursorTrace() {
+
+	FHitResult CursorHit;
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	
+	if (!CursorHit.bBlockingHit) return;
+
+	LastActor = ThisActor;
+	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
+
+	/*
+	 * Linha de traçado do cursor. Estes são os possíveis cenários:
+	 *  A. O LastActor é null e ThisActor é null
+	 *		- Não faça nada
+	 *	B. LastActor é null e ThisActor é válido (valid)
+	 *		- Highlight ThisActor
+	 *	C. LastActor é válido (valid) e ThisActor é null
+	 *		- UnHighlight LastActor
+	 *	D. Os dois atores são válidos, mas LastActor != ThisActor
+	 *		- UnHilight LastActor, e Highlight ThisActor
+	 *	E. Os dois atores são válidos, e os dois atores são os mesmos
+	 *		- Não faça nada
+	 */
+
+	if (LastActor == nullptr) {
+		
+		if(ThisActor != nullptr) {
+			//Caso B
+			ThisActor->HighlightActor();
+			
+		} else {
+			// Caso A - Os dois são nulos, não faça nada.
+			
+		}
+		
+	} else {	//LastActor é válido
+
+		if (ThisActor == nullptr) {
+
+			//Caso C
+			LastActor->UnHighlightActor();
+			
+		} else {	// Os dois atores são válidos
+
+			if (LastActor != ThisActor) {
+				//Caso D
+				LastActor->UnHighlightActor();
+				ThisActor->HighlightActor();
+			} else {
+				//Caso E - Não faça nada.
+			}
+			
+		}
+		
+	}
 	
 }
 
@@ -73,5 +139,7 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue) {
 		
 	}
 }
+
+
 
 
