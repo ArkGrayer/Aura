@@ -31,7 +31,7 @@ void AAuraPlayerController::CursorTrace() {
 	if (!CursorHit.bBlockingHit) return;
 
 	LastActor = ThisActor;
-	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
+	ThisActor = CursorHit.GetActor();
 
 	/*
 	 * Linha de traçado do cursor. Estes são os possíveis cenários:
@@ -90,9 +90,10 @@ void AAuraPlayerController::BeginPlay() {
 	// Obtém o subsistema local de entrada aprimorada para o jogador atual e checa para caso não passe no teste, dê um
 	//crash
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(Subsystem);
+	if (Subsystem) {
 	// Adiciona o contexto do Aura ao subsistema de mapeamento de entrada.
-	Subsystem->AddMappingContext(AuraContext, 0);
+		Subsystem->AddMappingContext(AuraContext, 0);
+	}
 
 	// Configuração do modo de entrada para o jogo e UI.
 	FInputModeGameAndUI InputModeData;
